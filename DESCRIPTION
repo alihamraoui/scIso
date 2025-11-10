@@ -13,6 +13,12 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
+    dplyr,
+    ggplot2,
+    ggrepel,
+    latex2exp,
+    Matrix,
+    RColorBrewer,
     Seurat,
     stringr
 URL: https://github.com/alihamraoui/scIso

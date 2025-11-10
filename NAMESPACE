@@ -2,4 +2,4 @@
 
 export(computePHI)
 export(computePIMatrix)
-export(strsplit1)
+export(plotPIPHI)
