@@ -16,7 +16,7 @@ Default is \code{"ISO"}.}
 (e.g., \code{"counts"} or \code{"data"}). Default is \code{"counts"}.}
 }
 \value{
-A matrix of PI values (isoforms × cells) with \code{NA} where
+A matrix of PI values (isoforms - cells) with \code{NA} where
 total gene counts are zero.
 }
 \description{
@@ -28,7 +28,7 @@ by the total counts of all isoforms belonging to that gene within each cell.
 The function expects rownames in the form \code{GeneName..TranscriptID}. The part
 before the first double dot (\code{..}) is interpreted as the gene identifier.
 PI values are computed per isoform and per cell as:
-\deqn{PSI = count(isoform) / sum(counts of all isoforms from the same gene)}
+\deqn{PI = count(isoform) / sum(counts of all isoforms from the same gene)}
 
 Cells with zero total counts for a given gene return \code{NA} PI values for its isoforms.
 }

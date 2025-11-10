@@ -1,5 +1,5 @@
 Package: scIso
-Title: Quantify and visualize isoform-level expression heterogeneity from long-read single-cell RNA-seq data.
+Title: Quantify and visualize isoform-level expression heterogeneity from long-read single-cell RNA-seq data
 Version: 0.0.0.1
 Authors@R: 
     person("Ali", "Hamraoui", , "alihamraoui4@gmail.com", role = c("aut", "cre"),
