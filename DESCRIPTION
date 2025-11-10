@@ -13,6 +13,7 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
+    Seurat,
     stringr
 URL: https://github.com/alihamraoui/scIso
 BugReports: https://github.com/alihamraoui/scIso/issues
