@@ -14,3 +14,5 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     stringr
+URL: https://github.com/alihamraoui/scIso
+BugReports: https://github.com/alihamraoui/scIso/issues
