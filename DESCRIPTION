@@ -1,12 +1,11 @@
 Package: scIso
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Quantify and visualize isoform-level expression heterogeneity from long-read single-cell RNA-seq data.
+Version: 0.0.0.1
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
+    person("Ali", "Hamraoui", , "alihamraoui4@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: An analytical toolkit for assessing isoform usage variability and detecting differential isoform expression across single cells using long-read transcriptomic data.
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
