@@ -2,7 +2,7 @@
 % Please edit documentation in R/FeaturePlotPI.R
 \name{FeaturePlotPI}
 \alias{FeaturePlotPI}
-\title{Visualize isoform PI, ratios and distributions on embeddings}
+\title{Visualize isoform percent inclusion (PI), ratios and distributions on embeddings}
 \usage{
 FeaturePlotPI(
   obj,
@@ -25,36 +25,40 @@ FeaturePlotPI(
 
 \item{iso2}{Isoform ID for the second isoform (must be a row name in the assay).}
 
-\item{reduction}{Character string giving the name of the dimensional reduction}
+\item{reduction}{Name of the dimensional reduction to use (e.g. \code{"umap"}).}
 
-\item{assay}{Assay name containing isoform counts. Default: "ISO".}
+\item{assay}{Assay name containing isoform counts. Default: \code{"ISO"}.}
 
-\item{slot}{Slot to use in the assay (e.g. "counts", "data"). Default: "counts".}
+\item{slot}{Slot to use in the assay (e.g. \code{"counts"}, \code{"data"}).
+Default: \code{"counts"}.}
 
 \item{name}{Optional base name used to construct metadata column names.}
 
-\item{add_ratio}{Logical; if TRUE, add ratio and log2ratio to metadata. Default: TRUE.}
+\item{add_ratio}{Logical; if \code{TRUE}, add ratio and log2-ratio to metadata.
+Default: \code{TRUE}.}
 
-\item{min_total}{Numeric threshold: cells with iso1 + iso2 < min_total
-are set to NA for PI. Default: 0.}
+\item{min_total}{Numeric threshold: cells with \code{iso1 + iso2 < min_total}
+are set to \code{NA} for PI. Default: \code{0}.}
 
-\item{col}{Suffix used for PI-based metadata/label naming. Default: "PI".}
+\item{col}{Suffix used for PI-based metadata/label naming. Default: \code{"PI"}.}
 
-\item{bins}{Number of bins for the PI histogram. Default: 30.}
+\item{bins}{Number of bins for the PI histogram. Default: \code{30}.}
 }
 \value{
-A combined plot (patchwork) with three feature plots and one histogram.
+A \code{patchwork} object combining three feature plots and one histogram.
 }
 \description{
 This function visualizes the relative usage (PI, Percent Inclusion) of two
 isoforms across cells on a low-dimensional embedding stored in a Seurat object.
-It computes per-cell PI for each isoform, their ratio and log2-ratio, ajoute
-ces valeurs dans les meta.data, puis affiche :
+It computes per-cell PI for each isoform, their ratio and log2-ratio, adds
+these values to the object metadata, and displays:
+}
+\details{
 \itemize{
-\item PI de l'isoforme 1 sur l'embedding,
-\item PI de l'isoforme 2 sur l'embedding,
-\item log2(ratio iso1 / iso2) sur l'embedding,
-\item histogramme de la distribution de PI pour l'isoforme 1.
+\item PI of isoform 1 on the embedding,
+\item PI of isoform 2 on the embedding,
+\item log2(ratio iso1 / iso2) on the embedding,
+\item histogram of the PI distribution for isoform 1.
 }
 }
 \examples{
@@ -64,7 +68,6 @@ library(Matrix)
 
 set.seed(42)
 
-# Build sparse count matrix
 mat <- Matrix(
   rpois(200, lambda = 10),
   nrow = 2,
@@ -75,22 +78,21 @@ mat <- Matrix(
   )
 )
 
-# Create Seurat object with assay = "ISO"
 obj <- CreateSeuratObject(counts = mat, assay = "ISO")
 
-# Add UMAP reduction linked to ISO assay
 emb <- matrix(
   rnorm(200),
   ncol = 2,
   dimnames = list(colnames(obj), c("UMAP_1", "UMAP_2"))
 )
+
 obj[["umap"]] <- CreateDimReducObject(
   embeddings = emb,
   key = "UMAP_",
   assay = "ISO"
 )
 
-# Visualize isoform PI
-FeaturePlotPI(obj, "GeneA..Tx1", "GeneA..Tx2", name2D = "umap")
+FeaturePlotPI(obj, "GeneA..Tx1", "GeneA..Tx2", reduction = "umap")
 }
+
 }

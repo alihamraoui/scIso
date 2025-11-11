@@ -8,7 +8,7 @@ Description: An analytical toolkit for assessing isoform usage variability and d
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 Suggests: 
     testthat (>= 3.0.0),
     ggpubr (>= 0.6.2)
@@ -27,5 +27,6 @@ Imports:
     Seurat,
     stringr,
     tidyr
-URL: https://github.com/alihamraoui/scIso
+URL: https://alihamraoui.github.io/scIso, https://alihamraoui.github.io/scIso/
+https: //github.com/alihamraoui/scIso
 BugReports: https://github.com/alihamraoui/scIso/issues
