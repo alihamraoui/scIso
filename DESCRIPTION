@@ -22,7 +22,9 @@ Imports:
     patchwork,
     RColorBrewer,
     rlang,
+    scales,
     Seurat,
-    stringr
+    stringr,
+    tidyr
 URL: https://github.com/alihamraoui/scIso
 BugReports: https://github.com/alihamraoui/scIso/issues
