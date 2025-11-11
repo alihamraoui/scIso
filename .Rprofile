@@ -1,1 +1,3 @@
-library(devtools)
+if (interactive() && requireNamespace("devtools", quietly = TRUE)) {
+  devtools::load_all()
+}
