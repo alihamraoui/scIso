@@ -4,6 +4,7 @@
 #' between mean PI and Phi across isoforms. Isoforms can be filtered based on
 #' their mean PI and total gene-level support before plotting.
 #'
+#' @importFrom rlang .data
 #' @param pi_mat A numeric or sparse matrix of PI values (isoforms × cells).
 #' @param iso_mat A numeric or sparse matrix of isoform-level counts
 #'   (same dimensions and rownames as \code{pi_mat}), used to derive gene-level
@@ -119,3 +120,11 @@ plotPIPHI <- function(pi_mat, iso_mat,
       text = ggplot2::element_text(size = 15)
     )
 }
+
+utils::globalVariables(c(
+  "gene",
+  "count",
+  "gene_count",
+  "mean_pi",
+  "phi"
+))

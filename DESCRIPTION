@@ -18,7 +18,10 @@ Imports:
     ggrepel,
     latex2exp,
     Matrix,
+    paletteer,
+    patchwork,
     RColorBrewer,
+    rlang,
     Seurat,
     stringr
 URL: https://github.com/alihamraoui/scIso
