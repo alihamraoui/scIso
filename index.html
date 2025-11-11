@@ -48,38 +48,66 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="sciso">scIso<a class="anchor" aria-label="anchor" href="#sciso"></a>
 </h1></div>
-<!-- badges: start -->
-<!-- badges: end -->
-<p>The goal of scIso is to …</p>
+<p>An R package for quantifying and visualizing <strong>isoform-level heterogeneity</strong> in single-cell and spatial long-read RNA-seq data.<br>
+It provides a reproducible framework to compute isoform Percent Inclusion (PI) and intercellular variability (φ),<br>
+and to visualize isoform usage across cells, conditions, and pseudotime trajectories.</p>
+<hr>
+<div class="section level2">
+<h2 id="key-features">Key features<a class="anchor" aria-label="anchor" href="#key-features"></a>
+</h2>
+<ul>
+<li>
+<strong>Quantification</strong>
+<ul>
+<li>
+<code><a href="reference/computePIMatrix.html">computePIMatrix()</a></code> — compute isoform Percent Inclusion (PI) from Seurat assays.<br>
+</li>
+<li>
+<code>computePHIMatrix()</code> — estimate isoform-level variability (φ) using moment-matched Beta parameters.</li>
+</ul>
+</li>
+<li>
+<strong>Visualization</strong>
+<ul>
+<li>
+<code><a href="reference/FeaturePlotPI.html">FeaturePlotPI()</a></code> — project isoform PI or ratios on embeddings (UMAP, t-SNE, etc.).<br>
+</li>
+<li>
+<code><a href="reference/IsoformBoxPlot.html">IsoformBoxPlot()</a></code> — compare isoform PI/expression across conditions with optional Wilcoxon p-values.<br>
+</li>
+<li>
+<code><a href="reference/IsoformPseudotimePlot.html">IsoformPseudotimePlot()</a></code> — plot isoform dynamics along pseudotime with annotated metadata bands.</li>
+</ul>
+</li>
+<li>
+<strong>Integration</strong>
+<ul>
+<li>Compatible with <code>Seurat</code> v5 objects.</li>
+</ul>
+</li>
+</ul>
+<hr>
+</div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of scIso from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>You can install the development version from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"alihamraoui/scIso"</span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p>Dependencies:<br><code>Seurat</code>, <code>ggplot2</code>, <code>Matrix</code>, <code>dplyr</code>, <code>tidyr</code>, <code>stringr</code>, <code>paletteer</code>, <code>patchwork</code>, <code>RColorBrewer</code>, <code>scales</code>, <code>rlang</code>.<br>
+Optional: <code>ggpubr (&gt;= 0.6.2)</code> for statistical comparisons in <code><a href="reference/IsoformBoxPlot.html">IsoformBoxPlot()</a></code>. —</p>
+</blockquote>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
 </h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://alihamraoui.github.io/scIso">scIso</a></span><span class="op">)</span></span>
-<span><span class="co">## basic example code</span></span></code></pre></div>
-<p>What is special about using <code>README.Rmd</code> instead of just <code>README.md</code>? You can include R chunks like so:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cars</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      speed           dist       </span></span>
-<span><span class="co">#&gt;  Min.   : 4.0   Min.   :  2.00  </span></span>
-<span><span class="co">#&gt;  1st Qu.:12.0   1st Qu.: 26.00  </span></span>
-<span><span class="co">#&gt;  Median :15.0   Median : 36.00  </span></span>
-<span><span class="co">#&gt;  Mean   :15.4   Mean   : 42.98  </span></span>
-<span><span class="co">#&gt;  3rd Qu.:19.0   3rd Qu.: 56.00  </span></span>
-<span><span class="co">#&gt;  Max.   :25.0   Max.   :120.00</span></span></code></pre></div>
-<p>You’ll still need to render <code>README.Rmd</code> regularly, to keep <code>README.md</code> up-to-date. <code><a href="https://devtools.r-lib.org/reference/build_rmd.html" class="external-link">devtools::build_readme()</a></code> is handy for this. You could also use GitHub Actions to re-render <code>README.Rmd</code> every time you push. An example workflow can be found here: <a href="https://github.com/r-lib/actions/tree/v1/examples" class="external-link uri">https://github.com/r-lib/actions/tree/v1/examples</a>.</p>
-<p>You can also embed plots, for example:</p>
-<p><img src="reference/figures/README-pressure-1.png" width="100%"></p>
-<p>In that case, don’t forget to commit and push the resulting figure files, so they display on GitHub and CRAN.</p>
+<ul>
+<li>Written in <strong>R (≥ 4.3)</strong> using <code>roxygen2</code>, <code>devtools</code>, and <code>testthat</code>.</li>
+<li>All functions include built-in checks for reproducibility and Seurat compatibility.</li>
+<li>Tested with Seurat v5 .</li>
+</ul>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
