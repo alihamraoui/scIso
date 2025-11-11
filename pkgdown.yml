@@ -2,7 +2,7 @@ pandoc: 3.1.11
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles: {}
-last_built: 2025-11-11T23:42Z
+last_built: 2025-11-11T23:52Z
 urls:
   reference: https://alihamraoui.github.io/scIso/reference
   article: https://alihamraoui.github.io/scIso/articles
