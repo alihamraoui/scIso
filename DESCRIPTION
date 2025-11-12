@@ -11,7 +11,9 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Suggests: 
     testthat (>= 3.0.0),
-    ggpubr (>= 0.6.2)
+    ggpubr (>= 0.6.2),
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
 Imports: 
     dplyr,
@@ -31,3 +33,4 @@ Imports:
 URL: https://alihamraoui.github.io/scIso, https://alihamraoui.github.io/scIso/
 https: //github.com/alihamraoui/scIso
 BugReports: https://github.com/alihamraoui/scIso/issues
+VignetteBuilder: knitr
