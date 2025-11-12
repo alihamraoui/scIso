@@ -66,6 +66,209 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://alihamraoui.github.io/scIso">scIso</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cell_types</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/gzcon.html" class="external-link">gzcon</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">url</a></span><span class="op">(</span><span class="st">"https://zenodo.org/records/17585277/files/Cell_type_annotation.rds"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">scmat_iso_url</span> <span class="op">&lt;-</span> <span class="st">"https://zenodo.org/records/17585277/files/iso_matrix.zip"</span></span>
+<span></span>
+<span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".zip"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="va">scmat_iso_url</span>, <span class="va">tmp</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/unzip.html" class="external-link">unzip</a></span><span class="op">(</span><span class="va">tmp</span>, exdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">scmat_iso</span> <span class="op">&lt;-</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/Read10X.html" class="external-link">Read10X</a></span><span class="op">(</span>data.dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">assay</span> <span class="op">=</span> <span class="st">"ISO"</span></span>
+<span><span class="va">iso_assay</span> <span class="op">=</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/CreateAssayObject.html" class="external-link">CreateAssayObject</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">scmat_iso</span><span class="op">)</span></span>
+<span><span class="va">seurat_obj</span> <span class="op">=</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/CreateSeuratObject.html" class="external-link">CreateSeuratObject</a></span><span class="op">(</span>counts <span class="op">=</span> <span class="va">iso_assay</span>,</span>
+<span>                                        assay <span class="op">=</span> <span class="va">assay</span>,</span>
+<span>                                        project.name <span class="op">=</span> <span class="va">sample_name</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">seurat_obj</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'log_nCount_'</span>, <span class="va">assay</span><span class="op">)</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">seurat_obj</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'nCount_'</span>, <span class="va">assay</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">seurat_obj</span></span>
+<span><span class="co">#&gt; An object of class Seurat </span></span>
+<span><span class="co">#&gt; 93670 features across 4532 samples within 1 assay </span></span>
+<span><span class="co">#&gt; Active assay: ISO (93670 features, 0 variable features)</span></span>
+<span><span class="co">#&gt;  2 layers present: counts, data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">seurat_obj</span><span class="op">@</span><span class="va">assays</span><span class="op">$</span><span class="va">ISO</span><span class="op">$</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "BambuGene6100..BambuTx23926" "BambuGene1971..BambuTx30365"</span></span>
+<span><span class="co">#&gt; [3] "BambuGene3230..BambuTx42042" "BambuGene8892..BambuTx58725"</span></span>
+<span><span class="co">#&gt; [5] "Mup10..BambuTx68486"         "Mup12..BambuTx68510"</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">seurat_obj</span> <span class="op">=</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/NormalizeData.html" class="external-link">NormalizeData</a></span><span class="op">(</span><span class="va">seurat_obj</span>,</span>
+<span>                                   normalization.method <span class="op">=</span> <span class="st">"LogNormalize"</span>,</span>
+<span>                                   assay <span class="op">=</span> <span class="st">"ISO"</span>,</span>
+<span>                                   verbose<span class="op">=</span><span class="cn">F</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">seurat_obj</span> <span class="op">=</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/FindVariableFeatures.html" class="external-link">FindVariableFeatures</a></span><span class="op">(</span><span class="va">seurat_obj</span>,</span>
+<span>                                          assay <span class="op">=</span> <span class="st">"ISO"</span>,</span>
+<span>                                          nfeatures <span class="op">=</span> <span class="fl">3000</span>,</span>
+<span>                                          verbose<span class="op">=</span><span class="cn">F</span><span class="op">)</span></span>
+<span><span class="va">seurat_obj</span></span>
+<span><span class="co">#&gt; An object of class Seurat </span></span>
+<span><span class="co">#&gt; 93670 features across 4532 samples within 1 assay </span></span>
+<span><span class="co">#&gt; Active assay: ISO (93670 features, 3000 variable features)</span></span>
+<span><span class="co">#&gt;  2 layers present: counts, data</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">common_cells</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">seurat_obj</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cell_types</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">seurat_obj</span> <span class="op">&lt;-</span> <span class="va">seurat_obj</span><span class="op">[</span>,<span class="va">common_cells</span><span class="op">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/DefaultAssay.html" class="external-link">DefaultAssay</a></span><span class="op">(</span><span class="va">seurat_obj</span><span class="op">)</span> <span class="op">=</span> <span class="st">"ISO"</span></span>
+<span><span class="va">ndims</span> <span class="op">=</span> <span class="fl">18</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">seurat_obj</span> <span class="op">=</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/ScaleData.html" class="external-link">ScaleData</a></span><span class="op">(</span><span class="va">seurat_obj</span>,</span>
+<span>                               features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">seurat_obj</span><span class="op">)</span>, </span>
+<span>                               verbose <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">var_features</span> <span class="op">=</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">seurat_obj</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">seurat_obj</span> <span class="op">=</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/RunPCA.html" class="external-link">RunPCA</a></span><span class="op">(</span><span class="va">seurat_obj</span>, </span>
+<span>                            features <span class="op">=</span> <span class="va">var_features</span>,</span>
+<span>                            verbose <span class="op">=</span> <span class="cn">F</span>, </span>
+<span>                            reduction.name <span class="op">=</span> <span class="st">"RNA_pca"</span>, </span>
+<span>                            max_dims <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">seurat_obj</span> <span class="op">=</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/RunUMAP.html" class="external-link">RunUMAP</a></span><span class="op">(</span><span class="va">seurat_obj</span>,</span>
+<span>                             reduction <span class="op">=</span> <span class="st">"RNA_pca"</span>,</span>
+<span>                             dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">ndims</span>,</span>
+<span>                             seed.use <span class="op">=</span> <span class="fl">1337L</span>,</span>
+<span>                             verbose <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>                             reduction.name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"RNA_pca_"</span>, <span class="va">ndims</span>, <span class="st">"_umap"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric</span></span>
+<span><span class="co">#&gt; To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'</span></span>
+<span><span class="co">#&gt; This message will be shown once per session</span></span>
+<span></span>
+<span><span class="va">seurat_obj</span> <span class="op">=</span> <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/RunTSNE.html" class="external-link">RunTSNE</a></span><span class="op">(</span><span class="va">seurat_obj</span>,</span>
+<span>                             reduction <span class="op">=</span> <span class="st">"RNA_pca"</span>,</span>
+<span>                             dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">ndims</span>,</span>
+<span>                             seed.use <span class="op">=</span> <span class="fl">1337L</span>,</span>
+<span>                             verbose <span class="op">=</span> <span class="cn">F</span>,</span>
+<span>                             reduction.name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"RNA_pca_"</span>, <span class="va">ndims</span>, <span class="st">"_tsne"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">seurat_obj</span></span>
+<span><span class="co">#&gt; An object of class Seurat </span></span>
+<span><span class="co">#&gt; 93670 features across 3566 samples within 1 assay </span></span>
+<span><span class="co">#&gt; Active assay: ISO (93670 features, 3000 variable features)</span></span>
+<span><span class="co">#&gt;  3 layers present: counts, data, scale.data</span></span>
+<span><span class="co">#&gt;  3 dimensional reductions calculated: RNA_pca, RNA_pca_18_umap, RNA_pca_18_tsne</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cell_types_named</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">cell_types</span><span class="op">)</span><span class="op">[</span><span class="va">cell_types</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cell_types_named</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cell_types</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">seurat_obj</span><span class="op">$</span><span class="va">cell_types</span> <span class="op">&lt;-</span> <span class="cn">NA_character_</span></span>
+<span><span class="va">seurat_obj</span><span class="op">$</span><span class="va">cell_types</span><span class="op">[</span><span class="va">common_cells</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">cell_types_named</span><span class="op">[</span><span class="va">common_cells</span><span class="op">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">proj</span> <span class="op">&lt;-</span> <span class="st">"tsne"</span></span>
+<span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">seurat_obj</span>, reduction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"RNA_pca_18_"</span>, <span class="va">proj</span><span class="op">)</span>, group.by <span class="op">=</span> <span class="st">"cell_types"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">proj</span>,<span class="st">"\n"</span>, <span class="st">"MPNST"</span><span class="op">)</span>,</span>
+<span>                subtitle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">seurat_obj</span><span class="op">)</span>, <span class="st">" cells"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>aspect.ratio <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                 plot.title <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
+<span>                 plot.subtitle <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="getting-started_files/figure-html/cell_viz-1.png" class="r-plt" width="288"></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#pi_mtx &lt;- scIso::computePIMatrix(seurat_obj, </span></span>
+<span><span class="co">#                                 assay = "ISO",</span></span>
+<span><span class="co">#                                 slot = "count")</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="st">"https://zenodo.org/records/17585277/files/pi_mtx.rds"</span></span>
+<span><span class="va">tmp_rds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="va">url</span>, destfile <span class="op">=</span> <span class="va">tmp_rds</span>, mode <span class="op">=</span> <span class="st">"wb"</span>, quiet <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">pi_mtx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">tmp_rds</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">scIso</span><span class="fu">::</span><span class="fu"><a href="../reference/plotPIPHI.html">plotPIPHI</a></span><span class="op">(</span>pi_mat <span class="op">=</span> <span class="va">pi_mtx</span>,</span>
+<span>                 iso_mat <span class="op">=</span> <span class="va">seurat_obj</span><span class="op">@</span><span class="va">assays</span><span class="op">$</span><span class="va">ISO</span><span class="op">$</span><span class="va">counts</span>,</span>
+<span>                 min_gene_count <span class="op">=</span> <span class="fl">3000</span></span>
+<span>                 <span class="op">)</span></span></code></pre></div>
+<p><img src="getting-started_files/figure-html/plot_pi-1.png" class="r-plt" width="700"></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">scIso</span><span class="fu">::</span><span class="fu"><a href="../reference/FeaturePlotPI.html">FeaturePlotPI</a></span><span class="op">(</span><span class="va">seurat_obj</span>, </span>
+<span>                     name <span class="op">=</span> <span class="st">"Srsf3"</span>, </span>
+<span>                     reduction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"RNA_pca_18_"</span>, <span class="va">proj</span><span class="op">)</span>,</span>
+<span>                     iso1 <span class="op">=</span> <span class="st">"Srsf3..ENSMUST00000130216"</span>,</span>
+<span>                     iso2 <span class="op">=</span> <span class="st">"Srsf3..ENSMUST00000037776"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: The `slot` argument of `GetAssayData()` is deprecated as of SeuratObject 5.0.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `layer` argument instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">scIso</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/alihamraoui/scIso/issues&gt;</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
+<p><img src="getting-started_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" width="960"></p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
+<span><span class="co">#&gt;  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   </span></span>
+<span><span class="co">#&gt;  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          </span></span>
+<span><span class="co">#&gt; [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: UTC</span></span>
+<span><span class="co">#&gt; tzcode source: system (glibc)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt; [1] scIso_0.1.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] RColorBrewer_1.1-3     jsonlite_2.0.0         magrittr_2.0.4        </span></span>
+<span><span class="co">#&gt;   [4] spatstat.utils_3.2-0   farver_2.1.2           rmarkdown_2.30        </span></span>
+<span><span class="co">#&gt;   [7] fs_1.6.6               ragg_1.5.0             vctrs_0.6.5           </span></span>
+<span><span class="co">#&gt;  [10] ROCR_1.0-11            spatstat.explore_3.5-3 paletteer_1.6.0       </span></span>
+<span><span class="co">#&gt;  [13] htmltools_0.5.8.1      sass_0.4.10            sctransform_0.4.2     </span></span>
+<span><span class="co">#&gt;  [16] parallelly_1.45.1      KernSmooth_2.23-26     bslib_0.9.0           </span></span>
+<span><span class="co">#&gt;  [19] htmlwidgets_1.6.4      desc_1.4.3             ica_1.0-3             </span></span>
+<span><span class="co">#&gt;  [22] plyr_1.8.9             plotly_4.11.0          zoo_1.8-14            </span></span>
+<span><span class="co">#&gt;  [25] cachem_1.1.0           igraph_2.2.1           mime_0.13             </span></span>
+<span><span class="co">#&gt;  [28] lifecycle_1.0.4        pkgconfig_2.0.3        Matrix_1.7-4          </span></span>
+<span><span class="co">#&gt;  [31] R6_2.6.1               fastmap_1.2.0          fitdistrplus_1.2-4    </span></span>
+<span><span class="co">#&gt;  [34] future_1.67.0          shiny_1.11.1           digest_0.6.38         </span></span>
+<span><span class="co">#&gt;  [37] rematch2_2.1.2         patchwork_1.3.2        Seurat_5.3.1          </span></span>
+<span><span class="co">#&gt;  [40] tensor_1.5.1           prismatic_1.1.2        RSpectra_0.16-2       </span></span>
+<span><span class="co">#&gt;  [43] irlba_2.3.5.1          textshaping_1.0.4      labeling_0.4.3        </span></span>
+<span><span class="co">#&gt;  [46] progressr_0.18.0       latex2exp_0.9.6        spatstat.sparse_3.1-0 </span></span>
+<span><span class="co">#&gt;  [49] httr_1.4.7             polyclip_1.10-7        abind_1.4-8           </span></span>
+<span><span class="co">#&gt;  [52] compiler_4.5.2         withr_3.0.2            S7_0.2.0              </span></span>
+<span><span class="co">#&gt;  [55] fastDummies_1.7.5      MASS_7.3-65            tools_4.5.2           </span></span>
+<span><span class="co">#&gt;  [58] lmtest_0.9-40          otel_0.2.0             httpuv_1.6.16         </span></span>
+<span><span class="co">#&gt;  [61] future.apply_1.20.0    goftest_1.2-3          glue_1.8.0            </span></span>
+<span><span class="co">#&gt;  [64] nlme_3.1-168           promises_1.5.0         grid_4.5.2            </span></span>
+<span><span class="co">#&gt;  [67] Rtsne_0.17             cluster_2.1.8.1        reshape2_1.4.5        </span></span>
+<span><span class="co">#&gt;  [70] generics_0.1.4         gtable_0.3.6           spatstat.data_3.1-9   </span></span>
+<span><span class="co">#&gt;  [73] tidyr_1.3.1            data.table_1.17.8      sp_2.2-0              </span></span>
+<span><span class="co">#&gt;  [76] spatstat.geom_3.6-0    RcppAnnoy_0.0.22       ggrepel_0.9.6         </span></span>
+<span><span class="co">#&gt;  [79] RANN_2.6.2             pillar_1.11.1          stringr_1.6.0         </span></span>
+<span><span class="co">#&gt;  [82] spam_2.11-1            RcppHNSW_0.6.0         later_1.4.4           </span></span>
+<span><span class="co">#&gt;  [85] splines_4.5.2          dplyr_1.1.4            lattice_0.22-7        </span></span>
+<span><span class="co">#&gt;  [88] survival_3.8-3         deldir_2.0-4           tidyselect_1.2.1      </span></span>
+<span><span class="co">#&gt;  [91] miniUI_0.1.2           pbapply_1.7-4          knitr_1.50            </span></span>
+<span><span class="co">#&gt;  [94] gridExtra_2.3          scattermore_1.2        xfun_0.54             </span></span>
+<span><span class="co">#&gt;  [97] matrixStats_1.5.0      stringi_1.8.7          lazyeval_0.2.2        </span></span>
+<span><span class="co">#&gt; [100] yaml_2.3.10            evaluate_1.0.5         codetools_0.2-20      </span></span>
+<span><span class="co">#&gt; [103] tibble_3.3.0           cli_3.6.5              uwot_0.2.4            </span></span>
+<span><span class="co">#&gt; [106] xtable_1.8-4           reticulate_1.44.0      systemfonts_1.3.1     </span></span>
+<span><span class="co">#&gt; [109] jquerylib_0.1.4        Rcpp_1.1.0             globals_0.18.0        </span></span>
+<span><span class="co">#&gt; [112] spatstat.random_3.4-2  png_0.1-8              spatstat.univar_3.1-4 </span></span>
+<span><span class="co">#&gt; [115] parallel_4.5.2         pkgdown_2.2.0          ggplot2_4.0.0         </span></span>
+<span><span class="co">#&gt; [118] dotCall64_1.2          listenv_0.10.0         viridisLite_0.4.2     </span></span>
+<span><span class="co">#&gt; [121] ggthemes_5.1.0         scales_1.4.0           ggridges_0.5.7        </span></span>
+<span><span class="co">#&gt; [124] SeuratObject_5.2.0     purrr_1.2.0            crayon_1.5.3          </span></span>
+<span><span class="co">#&gt; [127] rlang_1.1.6            cowplot_1.2.0</span></span></code></pre></div>
   </main>
 </div>
 
