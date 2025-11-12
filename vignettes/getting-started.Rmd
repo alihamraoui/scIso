@@ -19,17 +19,9 @@ library(scIso)
 ```
 
 ```{r load_data}
-cell_types <- readRDS(gzcon(
-  url("https://zenodo.org/records/17585277/files/Cell_type_annotation.rds")))
+cell_types <- readRDS("data/Cell_type_annotation.rds")
 
-scmat_iso_url <- "https://zenodo.org/records/17585277/files/iso_matrix.zip"
-
-tmp <- tempfile(fileext = ".zip")
-download.file(scmat_iso_url, tmp)
-
-unzip(tmp, exdir = tempdir())
-
-scmat_iso <- Seurat::Read10X(data.dir = tempdir())
+scmat_iso <- Seurat::Read10X(data.dir = "data/iso_matrix/")
 ```
 
 ```{r init_sobj}
@@ -126,12 +118,7 @@ Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = 
 ```
 
 ```{r load_pi_matrix}
-url <- "https://zenodo.org/records/17585277/files/pi_mtx.rds"
-tmp_rds <- tempfile(fileext = ".rds")
-
-download.file(url, destfile = tmp_rds, mode = "wb", quiet = FALSE)
-
-pi_mtx <- readRDS(tmp_rds)
+pi_mtx <- readRDS("data/pi_mtx.rds")
 ```
 
 
