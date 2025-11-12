@@ -67,5 +67,5 @@ computePIMatrix <- function(seurat_obj,
                 base::nrow(pi_mat), " - ", base::ncol(pi_mat), ").")
 
   #pi_mat[is.na(pi_mat)] <- 0
-  return(pi_mat)
+  return(as.matrix(pi_mat))
 }
