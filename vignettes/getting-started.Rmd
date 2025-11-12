@@ -115,8 +115,8 @@ Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = 
                 subtitle = paste0(ncol(seurat_obj), " cells")) +
   Seurat::NoAxes() +
   ggplot2::theme(aspect.ratio = 1,
-                 plot.title = element_text(hjust = 0.5),
-                 plot.subtitle = element_text(hjust = 0.5))
+                 plot.title = ggplot2::element_text(hjust = 0.5),
+                 plot.subtitle = ggplot2::element_text(hjust = 0.5))
 ```
 
 ```{r compute_pi_mtx}
