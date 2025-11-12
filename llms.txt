@@ -71,3 +71,8 @@ devtools::install_github("alihamraoui/scIso")
 - [`plotPIPHI()`](https://alihamraoui.github.io/scIso/reference/plotPIPHI.md)
   : Plot mean PI vs Phi for isoforms
 
+# Articles
+
+### All vignettes
+
+- [getting-started](https://alihamraoui.github.io/scIso/articles/getting-started.md):
