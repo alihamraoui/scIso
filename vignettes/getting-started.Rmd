@@ -108,7 +108,7 @@ seurat_obj$cell_types <- NA_character_
 seurat_obj$cell_types[common_cells] <- cell_types_named[common_cells]
 ```
 
-```{r cell_viz, fig.height=3, fig.width=3}
+```{r cell_viz}
 proj <- "tsne"
 Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = "cell_types") +
   ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
@@ -142,12 +142,17 @@ scIso::plotPIPHI(pi_mat = pi_mtx,
                  )
 ```
 
-```{r fig.height=3, fig.width=10}
-scIso::FeaturePlotPI(seurat_obj, 
+```{r}
+p <- scIso::FeaturePlotPI(seurat_obj, 
                      name = "Srsf3", 
                      reduction = paste0("RNA_pca_18_", proj),
                      iso1 = "Srsf3..ENSMUST00000130216",
                      iso2 = "Srsf3..ENSMUST00000037776")
+p[[3]] | p[[4]]
+```
+
+```{r}
+p[[1]] | p[[2]]
 ```
 
 ```{r}
