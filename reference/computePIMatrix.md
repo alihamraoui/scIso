@@ -68,7 +68,6 @@ pi <- computePIMatrix(seurat_obj)
 #> [computePIMatrix] Extracted assay 'ISO' (4 isoforms - 2 cells).
 #> [computePIMatrix] PI matrix computed successfully (dim: 4 - 2).
 head(pi)
-#> 4 x 2 Matrix of class "dgeMatrix"
 #>             Cell1 Cell2
 #> G1..Tx1 0.6666667  0.00
 #> G1..Tx2 0.3333333  1.00
