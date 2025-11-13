@@ -2,6 +2,12 @@
 
 [![](logo.svg)](https://alihamraoui.github.io/scIso/images/schema.png)
 
+[![pkgdown /
+tests](https://github.com/alihamraoui/scIso/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/alihamraoui/scIso/actions/workflows/pkgdown.yaml)
+![License: GPL
+v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)[![Mastodon
+Follow](https://img.shields.io/mastodon/follow/111487733409234458?domain=genomic.social)](https://genomic.social/@Genomique_ENS)
+
 An R package for quantifying and visualizing **isoform-level
 heterogeneity** in single-cell and spatial long-read RNA-seq data.  
 It provides a reproducible framework to compute isoform usage
