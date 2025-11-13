@@ -1,7 +1,8 @@
 # scIso
+<a href="images/schema.png"><img src="logo.svg" align="middle" height="150" width="150" >
+
 An R package for quantifying and visualizing **isoform-level heterogeneity** in single-cell and spatial long-read RNA-seq data.  
-It provides a reproducible framework to compute isoform Percent Inclusion (PI) and intercellular variability (φ),  
-and to visualize isoform usage across cells, conditions, and pseudotime trajectories.
+It provides a reproducible framework to compute isoform usage intercellular variability and to visualize it across conditions, and pseudotime trajectories.
 
 ---
 
@@ -17,7 +18,7 @@ and to visualize isoform usage across cells, conditions, and pseudotime trajecto
   - `IsoformPseudotimePlot()` — plot isoform dynamics along pseudotime with annotated metadata bands.
 
 - **Integration**
-  - Compatible with `Seurat` v5 objects.
+  - Use `Seurat` v5 objects and compatible with most scRNA-seq long-read pipelines (Sicelore, wf-single-cell...).
 
 ---
 
