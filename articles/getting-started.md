@@ -2,20 +2,30 @@
 
 ``` r
 library(scIso)
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 ```
 
 ``` r
 cell_types <- readRDS(gzcon(
   url("https://zenodo.org/records/17585277/files/Cell_type_annotation.rds")))
 
-scmat_iso_url <- "https://zenodo.org/records/17585277/files/iso_matrix.zip"
+pseudotime <- readRDS(gzcon(
+  url("https://zenodo.org/records/17654917/files/Pseudotime_2020_23.rds")))
 
-tmp <- tempfile(fileext = ".zip")
-download.file(scmat_iso_url, tmp)
-
-unzip(tmp, exdir = tempdir())
-
-scmat_iso <- Seurat::Read10X(data.dir = tempdir())
+if (curl::has_internet()) {
+  tmp <- tempfile(fileext = ".zip")
+  curl::curl_download("https://zenodo.org/records/17585277/files/iso_matrix.zip?download=1", tmp)
+  unzip(tmp, exdir = tempdir())
+  scmat_iso <- Seurat::Read10X(data.dir = tempdir())
+}
 ```
 
 ``` r
@@ -104,6 +114,22 @@ seurat_obj
 ```
 
 ``` r
+seurat_obj = Seurat::FindNeighbors(seurat_obj, reduction = "RNA_pca", dims = c(1:ndims))
+#> Computing nearest neighbor graph
+#> Computing SNN
+seurat_obj = Seurat::FindClusters(seurat_obj, resolution = 0.5)
+#> Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+#> 
+#> Number of nodes: 3566
+#> Number of edges: 128336
+#> 
+#> Running Louvain algorithm...
+#> Maximum modularity in 10 random starts: 0.8735
+#> Number of communities: 9
+#> Elapsed time: 0 seconds
+```
+
+``` r
 cell_types_named <- levels(cell_types)[cell_types]
 names(cell_types_named) <- names(cell_types)
 
@@ -113,16 +139,28 @@ seurat_obj$cell_types[common_cells] <- cell_types_named[common_cells]
 
 ``` r
 proj <- "tsne"
-Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = "cell_types") +
-  ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
-                subtitle = paste0(ncol(seurat_obj), " cells")) +
-  Seurat::NoAxes() +
-  ggplot2::theme(aspect.ratio = 1,
-                 plot.title = ggplot2::element_text(hjust = 0.5),
-                 plot.subtitle = ggplot2::element_text(hjust = 0.5))
+Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), label = T) +
+                      ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
+                                    subtitle = paste0(ncol(seurat_obj), " cells")) +
+                      Seurat::NoAxes() +
+                      ggplot2::theme(aspect.ratio = 1,
+                                     plot.title = ggplot2::element_text(hjust = 0.5),
+                                     plot.subtitle = ggplot2::element_text(hjust = 0.5)) |
+
+            Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = "cell_types") +
+                    ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
+                                  subtitle = paste0(ncol(seurat_obj), " cells")) +
+                    Seurat::NoAxes() +
+                    ggplot2::theme(aspect.ratio = 1,
+                                   plot.title = ggplot2::element_text(hjust = 0.5),
+                                   plot.subtitle = ggplot2::element_text(hjust = 0.5))
 ```
 
 ![](getting-started_files/figure-html/cell_viz-1.png)
+
+``` r
+#p_clusters | p_annot
+```
 
 ``` r
 #pi_mtx <- scIso::computePIMatrix(seurat_obj, 
@@ -163,13 +201,98 @@ p <- scIso::FeaturePlotPI(seurat_obj,
 p[[3]] | p[[4]]
 ```
 
-![](getting-started_files/figure-html/unnamed-chunk-2-1.png)
+![](getting-started_files/figure-html/plot_ration_and_pi_dist-1.png)
 
 ``` r
 p[[1]] | p[[2]]
 ```
 
-![](getting-started_files/figure-html/unnamed-chunk-3-1.png)
+![](getting-started_files/figure-html/plot_iso-1.png)
+
+``` r
+major <- seurat_obj@meta.data %>%
+            group_by(seurat_clusters) %>%
+            summarise(cell_annotation=names(which.max(table(cell_types))))
+
+idx <- match(seurat_obj@meta.data$seurat_clusters, major$seurat_clusters)
+seurat_obj$cell_pop <- major$cell_annotation[idx]
+```
+
+``` r
+seurat_obj <- subset(seurat_obj, subset = cell_pop == "tumor cells")
+
+seurat_obj$tumor_cell_type <- ifelse(seurat_obj$seurat_clusters == 4, "Sox10+", "Sox9+")
+seurat_obj$tumor_cell_type <- ifelse(seurat_obj$seurat_clusters == 4, "Sox10+", "Sox9+")
+```
+
+``` r
+names(pseudotime) <- sub(".*_", "", names(pseudotime))
+
+seurat_obj$pseudotime <- pseudotime
+```
+
+``` r
+Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = "cell_pop") +
+                    ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
+                                  subtitle = paste0(ncol(seurat_obj), " cells")) +
+                    Seurat::NoAxes() +
+                    ggplot2::theme(aspect.ratio = 1,
+                                   plot.title = ggplot2::element_text(hjust = 0.5),
+                                   plot.subtitle = ggplot2::element_text(hjust = 0.5)) |
+  
+  
+  Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = "tumor_cell_type") +
+                    ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
+                                  subtitle = paste0(ncol(seurat_obj), " cells")) +
+                    Seurat::NoAxes() +
+                    ggplot2::theme(aspect.ratio = 1,
+                                   plot.title = ggplot2::element_text(hjust = 0.5),
+                                   plot.subtitle = ggplot2::element_text(hjust = 0.5)) |
+  
+  
+  Seurat::FeaturePlot(seurat_obj, features = "pseudotime",
+                    reduction = paste0("RNA_pca_18_", proj)) +
+  ggplot2::scale_color_gradientn(colors = rev(RColorBrewer::brewer.pal(name = "Spectral", n = 10))) +
+  ggplot2::ggtitle("Pseudotime") +
+  ggplot2::theme(aspect.ratio = 1,
+                 plot.title = ggplot2::element_text(hjust = 0.5)) +
+  Seurat::NoAxes()
+#> Scale for colour is already present.
+#> Adding another scale for colour, which will replace the existing scale.
+```
+
+![](getting-started_files/figure-html/viz_cells_annotations-1.png)
+
+``` r
+scIso::IsoformPseudotimePlot(seurat_obj, 
+                             gene = "Dnaja1",
+                             band_cols = "tumor_cell_type",
+                             pseudotime_col = "pseudotime",
+                             nbins = 80,
+                             mode = "PI",
+                             slot = "data") |
+
+scIso::IsoformPseudotimePlot(seurat_obj, 
+                             gene = "Dnaja1",
+                             band_cols = "tumor_cell_type",
+                             pseudotime_col = "pseudotime", 
+                             nbins = 30,
+                             mode = "exp",
+                             slot = "data")
+#> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+#> ℹ Please use `linewidth` instead.
+#> ℹ The deprecated feature was likely used in the scIso package.
+#>   Please report the issue at <https://github.com/alihamraoui/scIso/issues>.
+#> This warning is displayed once every 8 hours.
+#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+#> generated.
+#> `geom_smooth()` using formula = 'y ~ x'
+#> Warning: Removed 764 rows containing non-finite outside the scale range
+#> (`stat_smooth()`).
+#> `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](getting-started_files/figure-html/plot_pstime-1.png)
 
 ``` r
 sessionInfo()
@@ -194,7 +317,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] scIso_0.1.0
+#> [1] future_1.68.0 dplyr_1.1.4   scIso_0.1.0  
 #> 
 #> loaded via a namespace (and not attached):
 #>   [1] RColorBrewer_1.1-3     jsonlite_2.0.0         magrittr_2.0.4        
@@ -208,14 +331,14 @@ sessionInfo()
 #>  [25] zoo_1.8-14             cachem_1.1.0           igraph_2.2.1          
 #>  [28] mime_0.13              lifecycle_1.0.4        pkgconfig_2.0.3       
 #>  [31] Matrix_1.7-4           R6_2.6.1               fastmap_1.2.0         
-#>  [34] fitdistrplus_1.2-4     future_1.67.0          shiny_1.11.1          
-#>  [37] digest_0.6.38          rematch2_2.1.2         patchwork_1.3.2       
-#>  [40] Seurat_5.3.1           tensor_1.5.1           prismatic_1.1.2       
-#>  [43] RSpectra_0.16-2        irlba_2.3.5.1          textshaping_1.0.4     
-#>  [46] labeling_0.4.3         progressr_0.18.0       latex2exp_0.9.6       
-#>  [49] spatstat.sparse_3.1-0  httr_1.4.7             polyclip_1.10-7       
+#>  [34] fitdistrplus_1.2-4     shiny_1.11.1           digest_0.6.39         
+#>  [37] rematch2_2.1.2         patchwork_1.3.2        Seurat_5.3.1          
+#>  [40] tensor_1.5.1           prismatic_1.1.2        RSpectra_0.16-2       
+#>  [43] irlba_2.3.5.1          textshaping_1.0.4      labeling_0.4.3        
+#>  [46] progressr_0.18.0       latex2exp_0.9.6        spatstat.sparse_3.1-0 
+#>  [49] mgcv_1.9-3             httr_1.4.7             polyclip_1.10-7       
 #>  [52] abind_1.4-8            compiler_4.5.2         withr_3.0.2           
-#>  [55] S7_0.2.0               fastDummies_1.7.5      MASS_7.3-65           
+#>  [55] S7_0.2.1               fastDummies_1.7.5      MASS_7.3-65           
 #>  [58] tools_4.5.2            lmtest_0.9-40          otel_0.2.0            
 #>  [61] httpuv_1.6.16          future.apply_1.20.0    goftest_1.2-3         
 #>  [64] glue_1.8.0             nlme_3.1-168           promises_1.5.0        
@@ -225,19 +348,19 @@ sessionInfo()
 #>  [76] sp_2.2-0               spatstat.geom_3.6-0    RcppAnnoy_0.0.22      
 #>  [79] ggrepel_0.9.6          RANN_2.6.2             pillar_1.11.1         
 #>  [82] stringr_1.6.0          spam_2.11-1            RcppHNSW_0.6.0        
-#>  [85] later_1.4.4            splines_4.5.2          dplyr_1.1.4           
-#>  [88] lattice_0.22-7         survival_3.8-3         deldir_2.0-4          
-#>  [91] tidyselect_1.2.1       miniUI_0.1.2           pbapply_1.7-4         
-#>  [94] knitr_1.50             gridExtra_2.3          scattermore_1.2       
-#>  [97] xfun_0.54              matrixStats_1.5.0      stringi_1.8.7         
-#> [100] lazyeval_0.2.2         yaml_2.3.10            evaluate_1.0.5        
-#> [103] codetools_0.2-20       tibble_3.3.0           cli_3.6.5             
-#> [106] uwot_0.2.4             xtable_1.8-4           reticulate_1.44.0     
-#> [109] systemfonts_1.3.1      jquerylib_0.1.4        Rcpp_1.1.0            
-#> [112] globals_0.18.0         spatstat.random_3.4-2  png_0.1-8             
-#> [115] spatstat.univar_3.1-4  parallel_4.5.2         pkgdown_2.2.0         
-#> [118] ggplot2_4.0.0          dotCall64_1.2          listenv_0.10.0        
-#> [121] viridisLite_0.4.2      ggthemes_5.1.0         scales_1.4.0          
-#> [124] ggridges_0.5.7         crayon_1.5.3           SeuratObject_5.2.0    
-#> [127] purrr_1.2.0            rlang_1.1.6            cowplot_1.2.0
+#>  [85] later_1.4.4            splines_4.5.2          lattice_0.22-7        
+#>  [88] survival_3.8-3         deldir_2.0-4           tidyselect_1.2.1      
+#>  [91] miniUI_0.1.2           pbapply_1.7-4          knitr_1.50            
+#>  [94] gridExtra_2.3          scattermore_1.2        xfun_0.54             
+#>  [97] matrixStats_1.5.0      stringi_1.8.7          lazyeval_0.2.2        
+#> [100] yaml_2.3.10            evaluate_1.0.5         codetools_0.2-20      
+#> [103] tibble_3.3.0           cli_3.6.5              uwot_0.2.4            
+#> [106] xtable_1.8-4           reticulate_1.44.1      systemfonts_1.3.1     
+#> [109] jquerylib_0.1.4        Rcpp_1.1.0             globals_0.18.0        
+#> [112] spatstat.random_3.4-2  png_0.1-8              spatstat.univar_3.1-5 
+#> [115] parallel_4.5.2         pkgdown_2.2.0          ggplot2_4.0.1         
+#> [118] dotCall64_1.2          listenv_0.10.0         viridisLite_0.4.2     
+#> [121] ggthemes_5.1.0         scales_1.4.0           ggridges_0.5.7        
+#> [124] crayon_1.5.3           SeuratObject_5.2.0     purrr_1.2.0           
+#> [127] rlang_1.1.6            cowplot_1.2.0
 ```
