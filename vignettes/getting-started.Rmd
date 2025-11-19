@@ -221,7 +221,7 @@ Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = 
   Seurat::NoAxes()
 ```
 
-```{r plot_pstime, fig.height=4, fig.width=18}
+```{r plot_pstime, fig.height=8, fig.width=26}
 scIso::IsoformPseudotimePlot(seurat_obj, 
                              gene = "Dnaja1",
                              band_cols = "tumor_cell_type",
