@@ -16,20 +16,22 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(scIso)
+library(dplyr)
 ```
 
 ```{r load_data}
 cell_types <- readRDS(gzcon(
   url("https://zenodo.org/records/17585277/files/Cell_type_annotation.rds")))
 
-scmat_iso_url <- "https://zenodo.org/records/17585277/files/iso_matrix.zip"
+pseudotime <- readRDS(gzcon(
+  url("https://zenodo.org/records/17654917/files/Pseudotime_2020_23.rds")))
 
-tmp <- tempfile(fileext = ".zip")
-download.file(scmat_iso_url, tmp)
-
-unzip(tmp, exdir = tempdir())
-
-scmat_iso <- Seurat::Read10X(data.dir = tempdir())
+if (curl::has_internet()) {
+  tmp <- tempfile(fileext = ".zip")
+  curl::curl_download("https://zenodo.org/records/17585277/files/iso_matrix.zip?download=1", tmp)
+  unzip(tmp, exdir = tempdir())
+  scmat_iso <- Seurat::Read10X(data.dir = tempdir())
+}
 ```
 
 ```{r init_sobj}
@@ -100,6 +102,11 @@ seurat_obj = Seurat::RunTSNE(seurat_obj,
 seurat_obj
 ```
 
+```{r clustering}
+seurat_obj = Seurat::FindNeighbors(seurat_obj, reduction = "RNA_pca", dims = c(1:ndims))
+seurat_obj = Seurat::FindClusters(seurat_obj, resolution = 0.5)
+```
+
 ```{r cell_annotation}
 cell_types_named <- levels(cell_types)[cell_types]
 names(cell_types_named) <- names(cell_types)
@@ -110,14 +117,24 @@ seurat_obj$cell_types[common_cells] <- cell_types_named[common_cells]
 
 ```{r cell_viz}
 proj <- "tsne"
-Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = "cell_types") +
-  ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
-                subtitle = paste0(ncol(seurat_obj), " cells")) +
-  Seurat::NoAxes() +
-  ggplot2::theme(aspect.ratio = 1,
-                 plot.title = ggplot2::element_text(hjust = 0.5),
-                 plot.subtitle = ggplot2::element_text(hjust = 0.5))
+Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), label = T) +
+                      ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
+                                    subtitle = paste0(ncol(seurat_obj), " cells")) +
+                      Seurat::NoAxes() +
+                      ggplot2::theme(aspect.ratio = 1,
+                                     plot.title = ggplot2::element_text(hjust = 0.5),
+                                     plot.subtitle = ggplot2::element_text(hjust = 0.5)) |
+
+            Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = "cell_types") +
+                    ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
+                                  subtitle = paste0(ncol(seurat_obj), " cells")) +
+                    Seurat::NoAxes() +
+                    ggplot2::theme(aspect.ratio = 1,
+                                   plot.title = ggplot2::element_text(hjust = 0.5),
+                                   plot.subtitle = ggplot2::element_text(hjust = 0.5))
+#p_clusters | p_annot
 ```
+
 
 ```{r compute_pi_mtx}
 #pi_mtx <- scIso::computePIMatrix(seurat_obj, 
@@ -141,7 +158,7 @@ scIso::plotPIPHI(pi_mat = pi_mtx,
                  )
 ```
 
-```{r}
+```{r plot_ration_and_pi_dist}
 p <- scIso::FeaturePlotPI(seurat_obj, 
                      name = "Srsf3", 
                      reduction = paste0("RNA_pca_18_", proj),
@@ -150,11 +167,79 @@ p <- scIso::FeaturePlotPI(seurat_obj,
 p[[3]] | p[[4]]
 ```
 
-```{r}
+```{r plot_iso}
 p[[1]] | p[[2]]
 ```
 
-```{r}
+```{r annot_clusters}
+major <- seurat_obj@meta.data %>%
+            group_by(seurat_clusters) %>%
+            summarise(cell_annotation=names(which.max(table(cell_types))))
+
+idx <- match(seurat_obj@meta.data$seurat_clusters, major$seurat_clusters)
+seurat_obj$cell_pop <- major$cell_annotation[idx]
+```
+
+```{r annot_subpopulations}
+seurat_obj <- subset(seurat_obj, subset = cell_pop == "tumor cells")
+
+seurat_obj$tumor_cell_type <- ifelse(seurat_obj$seurat_clusters == 4, "Sox10+", "Sox9+")
+seurat_obj$tumor_cell_type <- ifelse(seurat_obj$seurat_clusters == 4, "Sox10+", "Sox9+")
+```
+
+```{r assign_pstime}
+names(pseudotime) <- sub(".*_", "", names(pseudotime))
+
+seurat_obj$pseudotime <- pseudotime
+```
+
+```{r viz_cells_annotations}
+Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = "cell_pop") +
+                    ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
+                                  subtitle = paste0(ncol(seurat_obj), " cells")) +
+                    Seurat::NoAxes() +
+                    ggplot2::theme(aspect.ratio = 1,
+                                   plot.title = ggplot2::element_text(hjust = 0.5),
+                                   plot.subtitle = ggplot2::element_text(hjust = 0.5)) |
+  
+  
+  Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = "tumor_cell_type") +
+                    ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
+                                  subtitle = paste0(ncol(seurat_obj), " cells")) +
+                    Seurat::NoAxes() +
+                    ggplot2::theme(aspect.ratio = 1,
+                                   plot.title = ggplot2::element_text(hjust = 0.5),
+                                   plot.subtitle = ggplot2::element_text(hjust = 0.5)) |
+  
+  
+  Seurat::FeaturePlot(seurat_obj, features = "pseudotime",
+                    reduction = paste0("RNA_pca_18_", proj)) +
+  ggplot2::scale_color_gradientn(colors = rev(RColorBrewer::brewer.pal(name = "Spectral", n = 10))) +
+  ggplot2::ggtitle("Pseudotime") +
+  ggplot2::theme(aspect.ratio = 1,
+                 plot.title = ggplot2::element_text(hjust = 0.5)) +
+  Seurat::NoAxes()
+```
+
+```{r plot_pstime, fig.height=4, fig.width=18}
+scIso::IsoformPseudotimePlot(seurat_obj, 
+                             gene = "Dnaja1",
+                             band_cols = "tumor_cell_type",
+                             pseudotime_col = "pseudotime",
+                             nbins = 80,
+                             mode = "PI",
+                             slot = "data") |
+
+scIso::IsoformPseudotimePlot(seurat_obj, 
+                             gene = "Dnaja1",
+                             band_cols = "tumor_cell_type",
+                             pseudotime_col = "pseudotime", 
+                             nbins = 30,
+                             mode = "exp",
+                             slot = "data")
+```
+
+```{r rsession}
 sessionInfo()
 ```
 
