@@ -1,4 +1,38 @@
-# getting-started
+# Getting started with scIso
+
+## 1. Overview
+
+scIso provides tools to analyse isoform usage in single-cell long-read
+RNA-seq. Starting from an isoform count matrix and a standard Seurat
+object, scIso:
+
+- computes isoform-level metrics (Percent Inclusion, PI; heterogeneity,
+  PHI),
+
+- visualises isoform usage on embeddings,
+
+- links isoform dynamics to pseudotime.
+
+This vignette demonstrates a minimal end-to-end workflow using an
+example MPNST dataset downloaded from Zenodo.
+
+> ### Workflow summary
+>
+> - Load isoform counts and metadata (cell-type annotation, pseudotime).
+>
+> - Build a Seurat object and perform standard preprocessing.
+>
+> - Visualise clusters and cell-type annotation.
+>
+> - Compute and explore PI/PHI from an isoform count matrix.
+>
+> - Project isoform usage on embeddings and along pseudotime.
+>
+> - Briefly indicate how to adapt the workflow to your own data.
+
+## 2. Load packages
+
+We load scIso together with the core dependencies used in this vignette.
 
 ``` r
 library(scIso)
@@ -12,6 +46,11 @@ library(dplyr)
 #> 
 #>     intersect, setdiff, setequal, union
 ```
+
+## 3. Load example data from Zenodo
+
+We use a pre-computed cell-type annotation, a pseudotime vector and an
+isoform count matrix hosted on Zenodo.
 
 ``` r
 cell_types <- readRDS(gzcon(
@@ -27,6 +66,13 @@ if (curl::has_internet()) {
   scmat_iso <- Seurat::Read10X(data.dir = tempdir())
 }
 ```
+
+## 4. Build a Seurat object and run standard preprocessing
+
+We construct a Seurat object using the isoform counts as a dedicated
+assay and apply a standard preprocessing pipeline (normalisation,
+variable feature selection, PCA, UMAP/t-SNE, neighbour graph,
+clustering).
 
 ``` r
 assay = "ISO"
@@ -129,6 +175,11 @@ seurat_obj = Seurat::FindClusters(seurat_obj, resolution = 0.5)
 #> Elapsed time: 0 seconds
 ```
 
+## 5. Add cell-type annotation and visualise clusters
+
+We now bring in the external cell-type labels and overlay them on the
+embedding.
+
 ``` r
 cell_types_named <- levels(cell_types)[cell_types]
 names(cell_types_named) <- names(cell_types)
@@ -162,6 +213,12 @@ Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), label = T) 
 #p_clusters | p_annot
 ```
 
+## 6. Compute and explore isoform PI/PHI
+
+scIso uses PI (Percent Inclusion) and PHI (heterogeneity) to summarise
+isoform usage per gene. For speed, we load a pre-computed PI matrix, but
+the same result can be obtained with computePIMatrix() on the fly.
+
 ``` r
 #pi_mtx <- scIso::computePIMatrix(seurat_obj, 
 #                                 assay = "ISO",
@@ -184,6 +241,12 @@ scIso::plotPIPHI(pi_mat = pi_mtx,
 ```
 
 ![](getting-started_files/figure-html/plot_pi-1.png)
+
+## 7. Visualise isoform usage on embeddings
+
+We next contrast two isoforms of Srsf3 on the t-SNE embedding, using
+FeaturePlotPI(). This function computes PI for the selected isoforms and
+displays PI and log-ratio at the single-cell level.
 
 ``` r
 p <- scIso::FeaturePlotPI(seurat_obj, 
@@ -208,6 +271,11 @@ p[[1]] | p[[2]]
 ```
 
 ![](getting-started_files/figure-html/plot_iso-1.png)
+
+## 8. Restrict to tumour cells and add pseudotime
+
+We focus on tumour cells, refine the annotation, and add the pseudotime
+trajectory previously inferred for this dataset.
 
 ``` r
 major <- seurat_obj@meta.data %>%
@@ -263,6 +331,11 @@ Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = 
 
 ![](getting-started_files/figure-html/viz_cells_annotations-1.png)
 
+## 9. Isoform dynamics along pseudotime
+
+IsoformPseudotimePlot() summarises isoform usage for a given gene across
+pseudotime bins and optionally stratified by cell groups.
+
 ``` r
 scIso::IsoformPseudotimePlot(seurat_obj, 
                              gene = "Dnaja1",
@@ -270,14 +343,6 @@ scIso::IsoformPseudotimePlot(seurat_obj,
                              pseudotime_col = "pseudotime",
                              nbins = 80,
                              mode = "PI",
-                             slot = "data") |
-
-scIso::IsoformPseudotimePlot(seurat_obj, 
-                             gene = "Dnaja1",
-                             band_cols = "tumor_cell_type",
-                             pseudotime_col = "pseudotime", 
-                             nbins = 30,
-                             mode = "exp",
                              slot = "data")
 #> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 #> ℹ Please use `linewidth` instead.
@@ -289,10 +354,40 @@ scIso::IsoformPseudotimePlot(seurat_obj,
 #> `geom_smooth()` using formula = 'y ~ x'
 #> Warning: Removed 764 rows containing non-finite outside the scale range
 #> (`stat_smooth()`).
-#> `geom_smooth()` using formula = 'y ~ x'
 ```
 
 ![](getting-started_files/figure-html/plot_pstime-1.png)
+
+``` r
+scIso::IsoformPseudotimePlot(seurat_obj, 
+                             gene = "Dnaja1",
+                             band_cols = c("tumor_cell_type", "tumor_cell_type"),
+                             pseudotime_col = "pseudotime", 
+                             nbins = 30,
+                             mode = "exp",
+                             slot = "data")
+#> `geom_smooth()` using formula = 'y ~ x'
+```
+
+![](getting-started_files/figure-html/unnamed-chunk-2-1.png)
+
+## 10. Using scIso on your own data
+
+- To apply this workflow to your own dataset:
+
+- replace the example isoform matrix with your own (features = isoforms
+  or isoform-level identifiers, columns = cells/barcodes);
+
+- construct a Seurat object with an isoform assay (e.g. “ISO”) and
+  follow your preferred preprocessing strategy;
+
+- compute PI using computePIMatrix() on your isoform count matrix;
+
+- add any relevant metadata (cell types, clusters, trajectories) to
+  <seurat_obj@meta.data>;
+
+- use plotPIPHI(), FeaturePlotPI() and IsoformPseudotimePlot() to
+  interrogate isoform heterogeneity and dynamics.
 
 ``` r
 sessionInfo()
@@ -345,7 +440,7 @@ sessionInfo()
 #>  [67] grid_4.5.2             Rtsne_0.17             cluster_2.1.8.1       
 #>  [70] reshape2_1.4.5         generics_0.1.4         gtable_0.3.6          
 #>  [73] spatstat.data_3.1-9    tidyr_1.3.1            data.table_1.17.8     
-#>  [76] sp_2.2-0               spatstat.geom_3.6-0    RcppAnnoy_0.0.22      
+#>  [76] sp_2.2-0               spatstat.geom_3.6-1    RcppAnnoy_0.0.22      
 #>  [79] ggrepel_0.9.6          RANN_2.6.2             pillar_1.11.1         
 #>  [82] stringr_1.6.0          spam_2.11-1            RcppHNSW_0.6.0        
 #>  [85] later_1.4.4            splines_4.5.2          lattice_0.22-7        
