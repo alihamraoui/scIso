@@ -1,10 +1,13 @@
 ---
-title: "getting-started"
+title: "Getting started with scIso"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{getting-started}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r, include = FALSE}
@@ -14,10 +17,50 @@ knitr::opts_chunk$set(
 )
 ```
 
+## 1. Overview
+
+scIso provides tools to analyse isoform usage in single-cell long-read
+RNA-seq. Starting from an isoform count matrix and a standard Seurat
+object, scIso:
+
+-   computes isoform-level metrics (Percent Inclusion, PI;
+    heterogeneity, PHI),
+
+-   visualises isoform usage on embeddings,
+
+-   links isoform dynamics to pseudotime.
+
+This vignette demonstrates a minimal end-to-end workflow using an
+example MPNST dataset downloaded from Zenodo.
+
+> ### Workflow summary
+>
+> -   Load isoform counts and metadata (cell-type annotation,
+>     pseudotime).
+>
+> -   Build a Seurat object and perform standard preprocessing.
+>
+> -   Visualise clusters and cell-type annotation.
+>
+> -   Compute and explore PI/PHI from an isoform count matrix.
+>
+> -   Project isoform usage on embeddings and along pseudotime.
+>
+> -   Briefly indicate how to adapt the workflow to your own data.
+
+## 2. Load packages
+
+We load scIso together with the core dependencies used in this vignette.
+
 ```{r setup}
 library(scIso)
 library(dplyr)
 ```
+
+## 3. Load example data from Zenodo
+
+We use a pre-computed cell-type annotation, a pseudotime vector and an
+isoform count matrix hosted on Zenodo.
 
 ```{r load_data}
 cell_types <- readRDS(gzcon(
@@ -34,6 +77,13 @@ if (curl::has_internet()) {
 }
 ```
 
+## 4. Build a Seurat object and run standard preprocessing
+
+We construct a Seurat object using the isoform counts as a dedicated
+assay and apply a standard preprocessing pipeline (normalisation,
+variable feature selection, PCA, UMAP/t-SNE, neighbour graph,
+clustering).
+
 ```{r init_sobj}
 assay = "ISO"
 iso_assay = Seurat::CreateAssayObject(counts = scmat_iso)
@@ -46,7 +96,6 @@ seurat_obj[[paste0('log_nCount_', assay)]] = log(seurat_obj[[paste0('nCount_', a
 seurat_obj
 head(rownames(seurat_obj@assays$ISO$counts))
 ```
-
 
 ```{r normalization}
 seurat_obj = Seurat::NormalizeData(seurat_obj,
@@ -65,7 +114,6 @@ seurat_obj
 common_cells <- intersect(colnames(seurat_obj), names(cell_types))
 seurat_obj <- seurat_obj[,common_cells]
 ```
-
 
 ```{r set_assay}
 Seurat::DefaultAssay(seurat_obj) = "ISO"
@@ -107,6 +155,11 @@ seurat_obj = Seurat::FindNeighbors(seurat_obj, reduction = "RNA_pca", dims = c(1
 seurat_obj = Seurat::FindClusters(seurat_obj, resolution = 0.5)
 ```
 
+## 5. Add cell-type annotation and visualise clusters
+
+We now bring in the external cell-type labels and overlay them on the
+embedding.
+
 ```{r cell_annotation}
 cell_types_named <- levels(cell_types)[cell_types]
 names(cell_types_named) <- names(cell_types)
@@ -135,6 +188,11 @@ Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), label = T) 
 #p_clusters | p_annot
 ```
 
+## 6. Compute and explore isoform PI/PHI
+
+scIso uses PI (Percent Inclusion) and PHI (heterogeneity) to summarise
+isoform usage per gene. For speed, we load a pre-computed PI matrix, but
+the same result can be obtained with computePIMatrix() on the fly.
 
 ```{r compute_pi_mtx}
 #pi_mtx <- scIso::computePIMatrix(seurat_obj, 
@@ -150,13 +208,18 @@ if (curl::has_internet()) {
 }
 ```
 
-
 ```{r plot_pi}
 scIso::plotPIPHI(pi_mat = pi_mtx,
                  iso_mat = seurat_obj@assays$ISO$counts,
                  min_gene_count = 3000
                  )
 ```
+
+## 7. Visualise isoform usage on embeddings
+
+We next contrast two isoforms of Srsf3 on the t-SNE embedding, using
+FeaturePlotPI(). This function computes PI for the selected isoforms and
+displays PI and log-ratio at the single-cell level.
 
 ```{r plot_ration_and_pi_dist}
 p <- scIso::FeaturePlotPI(seurat_obj, 
@@ -170,6 +233,11 @@ p[[3]] | p[[4]]
 ```{r plot_iso}
 p[[1]] | p[[2]]
 ```
+
+## 8. Restrict to tumour cells and add pseudotime
+
+We focus on tumour cells, refine the annotation, and add the pseudotime
+trajectory previously inferred for this dataset.
 
 ```{r annot_clusters}
 major <- seurat_obj@meta.data %>%
@@ -221,6 +289,11 @@ Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = 
   Seurat::NoAxes()
 ```
 
+## 9. Isoform dynamics along pseudotime
+
+IsoformPseudotimePlot() summarises isoform usage for a given gene across
+pseudotime bins and optionally stratified by cell groups.
+
 ```{r plot_pstime, fig.height=8, fig.width=26}
 scIso::IsoformPseudotimePlot(seurat_obj, 
                              gene = "Dnaja1",
@@ -228,18 +301,37 @@ scIso::IsoformPseudotimePlot(seurat_obj,
                              pseudotime_col = "pseudotime",
                              nbins = 80,
                              mode = "PI",
-                             slot = "data") |
+                             slot = "data")
+```
 
+```{r}
 scIso::IsoformPseudotimePlot(seurat_obj, 
                              gene = "Dnaja1",
-                             band_cols = "tumor_cell_type",
+                             band_cols = c("tumor_cell_type", "tumor_cell_type"),
                              pseudotime_col = "pseudotime", 
                              nbins = 30,
                              mode = "exp",
                              slot = "data")
 ```
 
+## 10. Using scIso on your own data
+
+-   To apply this workflow to your own dataset:
+
+-   replace the example isoform matrix with your own (features =
+    isoforms or isoform-level identifiers, columns = cells/barcodes);
+
+-   construct a Seurat object with an isoform assay (e.g. "ISO") and
+    follow your preferred preprocessing strategy;
+
+-   compute PI using computePIMatrix() on your isoform count matrix;
+
+-   add any relevant metadata (cell types, clusters, trajectories) to
+    [seurat_obj\@meta.data](mailto:seurat_obj@meta.data){.email};
+
+-   use plotPIPHI(), FeaturePlotPI() and IsoformPseudotimePlot() to
+    interrogate isoform heterogeneity and dynamics.
+
 ```{r rsession}
 sessionInfo()
 ```
-
