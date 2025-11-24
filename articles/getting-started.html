@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Getting started with scIso • scIso</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -130,7 +135,7 @@ an isoform count matrix hosted on Zenodo.</p>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="build-a-seurat-object-and-run-standard-preprocessing">4. Build a Seurat object and run standard preprocessing<a class="anchor" aria-label="anchor" href="#build-a-seurat-object-and-run-standard-preprocessing"></a>
+<h2 id="build-a-seurat-object">4. Build a Seurat object<a class="anchor" aria-label="anchor" href="#build-a-seurat-object"></a>
 </h2>
 <p>We construct a Seurat object using the isoform counts as a dedicated
 assay and apply a standard preprocessing pipeline (normalisation,
@@ -227,7 +232,7 @@ clustering).</p>
 <span><span class="co">#&gt; Elapsed time: 0 seconds</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="add-cell-type-annotation-and-visualise-clusters">5. Add cell-type annotation and visualise clusters<a class="anchor" aria-label="anchor" href="#add-cell-type-annotation-and-visualise-clusters"></a>
+<h2 id="add-cell-type-annotation">5. Add cell-type annotation<a class="anchor" aria-label="anchor" href="#add-cell-type-annotation"></a>
 </h2>
 <p>We now bring in the external cell-type labels and overlay them on the
 embedding.</p>
@@ -254,12 +259,12 @@ embedding.</p>
 <span>                    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>aspect.ratio <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                                   plot.title <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>                                   plot.subtitle <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="getting-started_files/figure-html/cell_viz-1.png" class="r-plt" width="700"></p>
+<p><img src="getting-started_files/figure-html/cell_viz-1.png" class="r-plt" width="1152"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#p_clusters | p_annot</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="compute-and-explore-isoform-piphi">6. Compute and explore isoform PI/PHI<a class="anchor" aria-label="anchor" href="#compute-and-explore-isoform-piphi"></a>
+<h2 id="explore-isoform-piphi">6. Explore isoform PI/PHI<a class="anchor" aria-label="anchor" href="#explore-isoform-piphi"></a>
 </h2>
 <p>scIso uses PI (Percent Inclusion) and PHI (heterogeneity) to
 summarise isoform usage per gene. For speed, we load a pre-computed PI
@@ -283,7 +288,7 @@ the fly.</p>
 <p><img src="getting-started_files/figure-html/plot_pi-1.png" class="r-plt" width="700"></p>
 </div>
 <div class="section level2">
-<h2 id="visualise-isoform-usage-on-embeddings">7. Visualise isoform usage on embeddings<a class="anchor" aria-label="anchor" href="#visualise-isoform-usage-on-embeddings"></a>
+<h2 id="visualise-isoform-usage">7. Visualise isoform usage<a class="anchor" aria-label="anchor" href="#visualise-isoform-usage"></a>
 </h2>
 <p>We next contrast two isoforms of Srsf3 on the t-SNE embedding, using
 FeaturePlotPI(). This function computes PI for the selected isoforms and
@@ -301,11 +306,11 @@ displays PI and log-ratio at the single-cell level.</p>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
-<span><span class="va">p</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span> <span class="op">|</span> <span class="va">p</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
-<p><img src="getting-started_files/figure-html/plot_ration_and_pi_dist-1.png" class="r-plt" width="700"></p>
+<span><span class="va">p</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">|</span> <span class="va">p</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span> <span class="op">|</span> <span class="va">p</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
+<p><img src="getting-started_files/figure-html/plot_ration_and_pi_dist-1.png" class="r-plt" width="1152"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">|</span> <span class="va">p</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
-<p><img src="getting-started_files/figure-html/plot_iso-1.png" class="r-plt" width="700"></p>
+<p><img src="getting-started_files/figure-html/plot_iso-1.png" class="r-plt" width="1152"></p>
 </div>
 <div class="section level2">
 <h2 id="restrict-to-tumour-cells-and-add-pseudotime">8. Restrict to tumour cells and add pseudotime<a class="anchor" aria-label="anchor" href="#restrict-to-tumour-cells-and-add-pseudotime"></a>
@@ -356,7 +361,7 @@ pseudotime trajectory previously inferred for this dataset.</p>
 <span>  <span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Scale for <span style="color: #00BB00;">colour</span> is already present.</span></span>
 <span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">colour</span>, which will replace the existing scale.</span></span></code></pre></div>
-<p><img src="getting-started_files/figure-html/viz_cells_annotations-1.png" class="r-plt" width="700"></p>
+<p><img src="getting-started_files/figure-html/viz_cells_annotations-1.png" class="r-plt" width="1152"></p>
 </div>
 <div class="section level2">
 <h2 id="isoform-dynamics-along-pseudotime">9. Isoform dynamics along pseudotime<a class="anchor" aria-label="anchor" href="#isoform-dynamics-along-pseudotime"></a>
@@ -381,7 +386,7 @@ across pseudotime bins and optionally stratified by cell groups.</p>
 <span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span>
 <span><span class="co">#&gt; Warning: Removed 764 rows containing non-finite outside the scale range</span></span>
 <span><span class="co">#&gt; (`stat_smooth()`).</span></span></code></pre></div>
-<p><img src="getting-started_files/figure-html/plot_pstime-1.png" class="r-plt" width="2496"></p>
+<p><img src="getting-started_files/figure-html/plot_pstime-1.png" class="r-plt" width="960"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">scIso</span><span class="fu">::</span><span class="fu"><a href="../reference/IsoformPseudotimePlot.html">IsoformPseudotimePlot</a></span><span class="op">(</span><span class="va">seurat_obj</span>, </span>
 <span>                             gene <span class="op">=</span> <span class="st">"Dnaja1"</span>,</span>
@@ -391,7 +396,7 @@ across pseudotime bins and optionally stratified by cell groups.</p>
 <span>                             mode <span class="op">=</span> <span class="st">"exp"</span>,</span>
 <span>                             slot <span class="op">=</span> <span class="st">"data"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span></code></pre></div>
-<p><img src="getting-started_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" width="700"></p>
+<p><img src="getting-started_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" width="960"></p>
 </div>
 <div class="section level2">
 <h2 id="using-sciso-on-your-own-data">10. Using scIso on your own data<a class="anchor" aria-label="anchor" href="#using-sciso-on-your-own-data"></a>
@@ -439,7 +444,7 @@ interrogate isoform heterogeneity and dynamics.</p></li>
 <span><span class="co">#&gt;   [1] RColorBrewer_1.1-3     jsonlite_2.0.0         magrittr_2.0.4        </span></span>
 <span><span class="co">#&gt;   [4] spatstat.utils_3.2-0   farver_2.1.2           rmarkdown_2.30        </span></span>
 <span><span class="co">#&gt;   [7] fs_1.6.6               ragg_1.5.0             vctrs_0.6.5           </span></span>
-<span><span class="co">#&gt;  [10] ROCR_1.0-11            spatstat.explore_3.5-3 paletteer_1.6.0       </span></span>
+<span><span class="co">#&gt;  [10] ROCR_1.0-11            spatstat.explore_3.6-0 paletteer_1.6.0       </span></span>
 <span><span class="co">#&gt;  [13] htmltools_0.5.8.1      curl_7.0.0             sass_0.4.10           </span></span>
 <span><span class="co">#&gt;  [16] sctransform_0.4.2      parallelly_1.45.1      KernSmooth_2.23-26    </span></span>
 <span><span class="co">#&gt;  [19] bslib_0.9.0            htmlwidgets_1.6.4      desc_1.4.3            </span></span>
@@ -473,7 +478,7 @@ interrogate isoform heterogeneity and dynamics.</p></li>
 <span><span class="co">#&gt; [103] tibble_3.3.0           cli_3.6.5              uwot_0.2.4            </span></span>
 <span><span class="co">#&gt; [106] xtable_1.8-4           reticulate_1.44.1      systemfonts_1.3.1     </span></span>
 <span><span class="co">#&gt; [109] jquerylib_0.1.4        Rcpp_1.1.0             globals_0.18.0        </span></span>
-<span><span class="co">#&gt; [112] spatstat.random_3.4-2  png_0.1-8              spatstat.univar_3.1-5 </span></span>
+<span><span class="co">#&gt; [112] spatstat.random_3.4-3  png_0.1-8              spatstat.univar_3.1-5 </span></span>
 <span><span class="co">#&gt; [115] parallel_4.5.2         pkgdown_2.2.0          ggplot2_4.0.1         </span></span>
 <span><span class="co">#&gt; [118] dotCall64_1.2          listenv_0.10.0         viridisLite_0.4.2     </span></span>
 <span><span class="co">#&gt; [121] ggthemes_5.1.0         scales_1.4.0           ggridges_0.5.7        </span></span>

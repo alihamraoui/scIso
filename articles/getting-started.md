@@ -67,7 +67,7 @@ if (curl::has_internet()) {
 }
 ```
 
-## 4. Build a Seurat object and run standard preprocessing
+## 4. Build a Seurat object
 
 We construct a Seurat object using the isoform counts as a dedicated
 assay and apply a standard preprocessing pipeline (normalisation,
@@ -175,7 +175,7 @@ seurat_obj = Seurat::FindClusters(seurat_obj, resolution = 0.5)
 #> Elapsed time: 0 seconds
 ```
 
-## 5. Add cell-type annotation and visualise clusters
+## 5. Add cell-type annotation
 
 We now bring in the external cell-type labels and overlay them on the
 embedding.
@@ -213,7 +213,7 @@ Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), label = T) 
 #p_clusters | p_annot
 ```
 
-## 6. Compute and explore isoform PI/PHI
+## 6. Explore isoform PI/PHI
 
 scIso uses PI (Percent Inclusion) and PHI (heterogeneity) to summarise
 isoform usage per gene. For speed, we load a pre-computed PI matrix, but
@@ -242,7 +242,7 @@ scIso::plotPIPHI(pi_mat = pi_mtx,
 
 ![](getting-started_files/figure-html/plot_pi-1.png)
 
-## 7. Visualise isoform usage on embeddings
+## 7. Visualise isoform usage
 
 We next contrast two isoforms of Srsf3 on the t-SNE embedding, using
 FeaturePlotPI(). This function computes PI for the selected isoforms and
@@ -261,7 +261,7 @@ p <- scIso::FeaturePlotPI(seurat_obj,
 #> This warning is displayed once every 8 hours.
 #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 #> generated.
-p[[3]] | p[[4]]
+p[[1]] | p[[3]] | p[[4]]
 ```
 
 ![](getting-started_files/figure-html/plot_ration_and_pi_dist-1.png)
@@ -418,7 +418,7 @@ sessionInfo()
 #>   [1] RColorBrewer_1.1-3     jsonlite_2.0.0         magrittr_2.0.4        
 #>   [4] spatstat.utils_3.2-0   farver_2.1.2           rmarkdown_2.30        
 #>   [7] fs_1.6.6               ragg_1.5.0             vctrs_0.6.5           
-#>  [10] ROCR_1.0-11            spatstat.explore_3.5-3 paletteer_1.6.0       
+#>  [10] ROCR_1.0-11            spatstat.explore_3.6-0 paletteer_1.6.0       
 #>  [13] htmltools_0.5.8.1      curl_7.0.0             sass_0.4.10           
 #>  [16] sctransform_0.4.2      parallelly_1.45.1      KernSmooth_2.23-26    
 #>  [19] bslib_0.9.0            htmlwidgets_1.6.4      desc_1.4.3            
@@ -452,7 +452,7 @@ sessionInfo()
 #> [103] tibble_3.3.0           cli_3.6.5              uwot_0.2.4            
 #> [106] xtable_1.8-4           reticulate_1.44.1      systemfonts_1.3.1     
 #> [109] jquerylib_0.1.4        Rcpp_1.1.0             globals_0.18.0        
-#> [112] spatstat.random_3.4-2  png_0.1-8              spatstat.univar_3.1-5 
+#> [112] spatstat.random_3.4-3  png_0.1-8              spatstat.univar_3.1-5 
 #> [115] parallel_4.5.2         pkgdown_2.2.0          ggplot2_4.0.1         
 #> [118] dotCall64_1.2          listenv_0.10.0         viridisLite_0.4.2     
 #> [121] ggthemes_5.1.0         scales_1.4.0           ggridges_0.5.7        
