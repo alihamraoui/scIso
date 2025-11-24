@@ -77,7 +77,7 @@ if (curl::has_internet()) {
 }
 ```
 
-## 4. Build a Seurat object and run standard preprocessing
+## 4. Build a Seurat object
 
 We construct a Seurat object using the isoform counts as a dedicated
 assay and apply a standard preprocessing pipeline (normalisation,
@@ -155,7 +155,7 @@ seurat_obj = Seurat::FindNeighbors(seurat_obj, reduction = "RNA_pca", dims = c(1
 seurat_obj = Seurat::FindClusters(seurat_obj, resolution = 0.5)
 ```
 
-## 5. Add cell-type annotation and visualise clusters
+## 5. Add cell-type annotation
 
 We now bring in the external cell-type labels and overlay them on the
 embedding.
@@ -168,7 +168,7 @@ seurat_obj$cell_types <- NA_character_
 seurat_obj$cell_types[common_cells] <- cell_types_named[common_cells]
 ```
 
-```{r cell_viz}
+```{r cell_viz, fig.height=4, fig.width=12}
 proj <- "tsne"
 Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), label = T) +
                       ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
@@ -188,7 +188,7 @@ Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), label = T) 
 #p_clusters | p_annot
 ```
 
-## 6. Compute and explore isoform PI/PHI
+## 6. Explore isoform PI/PHI
 
 scIso uses PI (Percent Inclusion) and PHI (heterogeneity) to summarise
 isoform usage per gene. For speed, we load a pre-computed PI matrix, but
@@ -215,22 +215,22 @@ scIso::plotPIPHI(pi_mat = pi_mtx,
                  )
 ```
 
-## 7. Visualise isoform usage on embeddings
+## 7. Visualise isoform usage
 
 We next contrast two isoforms of Srsf3 on the t-SNE embedding, using
 FeaturePlotPI(). This function computes PI for the selected isoforms and
 displays PI and log-ratio at the single-cell level.
 
-```{r plot_ration_and_pi_dist}
+```{r plot_ration_and_pi_dist, fig.height=4, fig.width=12}
 p <- scIso::FeaturePlotPI(seurat_obj, 
                      name = "Srsf3", 
                      reduction = paste0("RNA_pca_18_", proj),
                      iso1 = "Srsf3..ENSMUST00000130216",
                      iso2 = "Srsf3..ENSMUST00000037776")
-p[[3]] | p[[4]]
+p[[1]] | p[[3]] | p[[4]]
 ```
 
-```{r plot_iso}
+```{r plot_iso, fig.height=4, fig.width=12}
 p[[1]] | p[[2]]
 ```
 
@@ -261,7 +261,7 @@ names(pseudotime) <- sub(".*_", "", names(pseudotime))
 seurat_obj$pseudotime <- pseudotime
 ```
 
-```{r viz_cells_annotations}
+```{r viz_cells_annotations, fig.height=4, fig.width=12}
 Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = "cell_pop") +
                     ggplot2::labs(title = paste0(proj,"\n", "MPNST"),
                                   subtitle = paste0(ncol(seurat_obj), " cells")) +
@@ -294,7 +294,7 @@ Seurat::DimPlot(seurat_obj, reduction = paste0("RNA_pca_18_", proj), group.by = 
 IsoformPseudotimePlot() summarises isoform usage for a given gene across
 pseudotime bins and optionally stratified by cell groups.
 
-```{r plot_pstime, fig.height=8, fig.width=26}
+```{r plot_pstime, fig.height=3, fig.width=10}
 scIso::IsoformPseudotimePlot(seurat_obj, 
                              gene = "Dnaja1",
                              band_cols = "tumor_cell_type",
@@ -304,7 +304,7 @@ scIso::IsoformPseudotimePlot(seurat_obj,
                              slot = "data")
 ```
 
-```{r}
+```{r fig.height=3, fig.width=10}
 scIso::IsoformPseudotimePlot(seurat_obj, 
                              gene = "Dnaja1",
                              band_cols = c("tumor_cell_type", "tumor_cell_type"),
